@@ -191,25 +191,20 @@ func main() {
 
 ## Performance
 
-### Benchmark: [Kubernetes](https://github.com/kubernetes/kubernetes)
+### Real-world Benchmarks
 
-**12,608 Go files · 3.5M lines of code · 326MB repo**
+Tested on popular open-source repositories (single run, `--no-cache`, default concurrency):
 
-| Run | Files | Duration | Throughput |
-|---|---|---|---|
-| Full parse | 12,615 | **72.6s** | 174 files/sec |
-| Incremental (no changes) | 0 parsed, 12,615 skipped | **1.56s** | **46x faster** ⚡ |
+| Repository | Language | Files | Functions | Types | Duration | Files/sec | Output |
+|---|---|---|---|---|---|---|---|
+| [kubernetes/kubernetes](https://github.com/kubernetes/kubernetes) | Go | 12,615 | 104,925 | 18,165 | **70.4s** | 179 | 69 MB |
+| [golang/go](https://github.com/golang/go) | Go | 10,302 | 89,294 | 17,999 | **57.3s** | 180 | 55 MB |
+| [microsoft/vscode](https://github.com/microsoft/vscode) | TypeScript | 10,002 | 31,640 | 16,404 | **59.1s** | 169 | 44 MB |
+| [facebook/react](https://github.com/facebook/react) | JS/TS | 4,345 | 12,885 | 535 | **9.3s** | 467 | 18 MB |
+| [tensorflow/tensorflow](https://github.com/tensorflow/tensorflow) | Python/Go | 3,194 | 64,695 | 6,864 | **125.9s** | 25 | 25 MB |
+| [django/django](https://github.com/django/django) | Python/JS | 2,945 | 31,928 | 10,951 | **6.2s** | 475 | 15 MB |
 
-### Output
-
-| Metric | Value |
-|---|---|
-| Markdown files generated | 12,614 |
-| Functions extracted | 104,922 |
-| Types extracted | 18,164 |
-| Output size | 69 MB |
-| Cache size | 2.9 MB |
-| `index.md` | 18,777 lines |
+> **Total**: 43,403 files parsed · 335,367 functions extracted · 70,918 types · 226 MB of structured documentation
 
 ### Micro-benchmarks (50 files)
 
