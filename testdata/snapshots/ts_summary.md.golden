@@ -1,0 +1,46 @@
+---
+file: js-sample/src/index.ts
+language: typescript
+lines: 30
+function_count: 4
+type_count: 2
+import_count: 1
+tags:
+  - has-functions
+  - has-types
+  - has-imports
+---
+
+## Functions
+
+### fetchUser
+- **Signature**: `async function fetchUser(id: string): Promise<User | null>`
+- **Line**: 16-19
+
+### addUser
+- **Signature**: `function addUser(data: Omit<User, 'id'>): User`
+- **Line**: 25-27
+
+### fetchUser
+- **Signature**: `async function fetchUser(id: string): Promise<User | null>`
+- **Line**: 16-19
+
+### addUser
+- **Signature**: `function addUser(data: Omit<User, 'id'>): User`
+- **Line**: 25-27
+
+## Types
+
+### User
+- **Kind**: interface
+- **Line**: 3-7
+
+### UserRole
+- **Kind**: type_alias
+- **Line**: 9-9
+
+## Imports
+
+| Import | Line |
+|---|---|
+| ./utils/helper | 1 |

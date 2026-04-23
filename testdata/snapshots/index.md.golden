@@ -1,0 +1,34 @@
+---
+project: sunset
+root: /project/sunset
+generated: "2026-01-01T00:00:00Z"
+sunset_version: test
+languages:
+  go:
+    files: 1
+    percentage: 33
+  python:
+    files: 1
+    percentage: 33
+  typescript:
+    files: 1
+    percentage: 33
+total_files: 3
+total_functions: 10
+total_types: 3
+modules:
+  - path: go-sample
+    files: 1
+  - path: js-sample/src
+    files: 1
+  - path: python-sample
+    files: 1
+---
+
+## Files
+
+| File | Language | Functions | Types | Lines |
+|---|---|---|---|---|
+| go-sample/main.go | go | 2 | 0 | 28 |
+| python-sample/main.py | python | 4 | 1 | 49 |
+| js-sample/src/index.ts | typescript | 4 | 2 | 30 |

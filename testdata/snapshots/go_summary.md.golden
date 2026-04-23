@@ -1,0 +1,36 @@
+---
+file: go-sample/main.go
+language: go
+package: main
+lines: 28
+function_count: 2
+type_count: 0
+import_count: 3
+tags:
+  - has-functions
+  - has-imports
+---
+
+## Functions
+
+### main
+- **Signature**: `func main()`
+- **Line**: 15-19
+- **Doc**: main starts the HTTP server and registers routes.
+
+### setupRouter
+- **Signature**: `func setupRouter() *http.ServeMux`
+- **Line**: 23-27
+- **Doc**: setupRouter creates and configures the HTTP router. It registers all application routes and returns the configured ServeMux.
+
+## Imports
+
+| Import | Line |
+|---|---|
+| fmt | 5 |
+| net/http | 6 |
+| example.com/sample/handler | 8 |
+
+## Constants
+
+- **Port** = `"8080"` [line 12]

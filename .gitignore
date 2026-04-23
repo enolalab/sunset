@@ -1,0 +1,31 @@
+# Binaries
+bin/
+/sunset
+*.exe
+
+# Build
+dist/
+
+# Dependencies
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sunset generated data
+.sunset/
+
+# Test
+coverage.out
+coverage.html
+
+# Go
+*.test

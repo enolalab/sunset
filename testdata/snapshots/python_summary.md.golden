@@ -1,0 +1,48 @@
+---
+file: python-sample/main.py
+language: python
+lines: 49
+function_count: 4
+type_count: 1
+import_count: 2
+tags:
+  - has-functions
+  - has-types
+  - has-imports
+---
+
+## Functions
+
+### create_user
+- **Signature**: `def create_user(name`
+- **Line**: 11-27
+- **Doc**: Create a new user with validation. Args: name: The user's display name. email: The user's email address. role: The user's role, defaults to 'user'. Returns: A new User instance. Raises: ValueError: If the email is invalid.
+
+### __init__
+- **Signature**: `def __init__(self, db_url`
+- **Line**: 33-36
+- **Doc**: Initialize with database connection.
+
+### get_user
+- **Signature**: `def get_user(self, user_id`
+- **Line**: 38-43
+- **Doc**: Find a user by their ID.
+
+### hash_password
+- **Signature**: `def hash_password(password`
+- **Line**: 46-48
+- **Doc**: Hash a password for storage.
+
+## Types
+
+### UserService
+- **Kind**: class
+- **Line**: 30-48
+- **Doc**: Service for managing users.
+
+## Imports
+
+| Import | Line |
+|---|---|
+| models.user | 3 |
+| utils.helper | 4 |
