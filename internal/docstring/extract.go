@@ -3,6 +3,8 @@
 package docstring
 
 import (
+	"strings"
+
 	tree_sitter "github.com/tree-sitter/go-tree-sitter"
 )
 
@@ -125,14 +127,14 @@ func cleanJSDoc(text string) string {
 
 	// Clean up line prefixes
 	result := ""
-	lines := splitLines(text)
+	lines := strings.Split(text, "\n")
 	for _, line := range lines {
-		line = trimLeft(line, " \t")
+		line = strings.TrimLeft(line, " \t")
 		if len(line) > 0 && line[0] == '*' {
 			line = line[1:]
-			line = trimLeft(line, " ")
+			line = strings.TrimLeft(line, " ")
 		}
-		line = trimRight(line, " \t")
+		line = strings.TrimRight(line, " \t")
 		if line != "" {
 			if result != "" {
 				result += " "
@@ -188,14 +190,14 @@ func cleanPythonDocstring(text string) string {
 			break
 		}
 	}
-	text = trimLeft(text, " \t\n")
-	text = trimRight(text, " \t\n")
+	text = strings.TrimLeft(text, " \t\n")
+	text = strings.TrimRight(text, " \t\n")
 
 	// Collapse to single line for frontmatter
 	result := ""
-	for _, line := range splitLines(text) {
-		line = trimLeft(line, " \t")
-		line = trimRight(line, " \t")
+	for _, line := range strings.Split(text, "\n") {
+		line = strings.TrimLeft(line, " \t")
+		line = strings.TrimRight(line, " \t")
 		if line != "" {
 			if result != "" {
 				result += " "
@@ -204,43 +206,4 @@ func cleanPythonDocstring(text string) string {
 		}
 	}
 	return result
-}
-
-// Helper functions to avoid strings package dependency
-func splitLines(s string) []string {
-	var lines []string
-	start := 0
-	for i := 0; i < len(s); i++ {
-		if s[i] == '\n' {
-			lines = append(lines, s[start:i])
-			start = i + 1
-		}
-	}
-	if start < len(s) {
-		lines = append(lines, s[start:])
-	}
-	return lines
-}
-
-func trimLeft(s string, cutset string) string {
-	for len(s) > 0 && containsByte(cutset, s[0]) {
-		s = s[1:]
-	}
-	return s
-}
-
-func trimRight(s string, cutset string) string {
-	for len(s) > 0 && containsByte(cutset, s[len(s)-1]) {
-		s = s[:len(s)-1]
-	}
-	return s
-}
-
-func containsByte(s string, b byte) bool {
-	for i := 0; i < len(s); i++ {
-		if s[i] == b {
-			return true
-		}
-	}
-	return false
 }

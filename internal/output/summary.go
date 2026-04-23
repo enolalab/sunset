@@ -1,6 +1,7 @@
 package output
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
@@ -540,13 +541,7 @@ func stripQuotes(s string) string {
 }
 
 func countLines(source []byte) int {
-	count := 1
-	for _, b := range source {
-		if b == '\n' {
-			count++
-		}
-	}
-	return count
+	return bytes.Count(source, []byte{'\n'}) + 1
 }
 
 func generateTags(info *FileInfo, _ string) []string {

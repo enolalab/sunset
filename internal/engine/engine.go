@@ -9,7 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/enolalab/sunset/internal/analyzer"
 	"github.com/enolalab/sunset/internal/cache"
 	"github.com/enolalab/sunset/internal/language"
 	"github.com/enolalab/sunset/internal/output"
@@ -81,6 +80,7 @@ func Run(cfg *Config) (*Result, error) {
 	type parseJob struct {
 		relPath string
 		content []byte
+		hash    string
 	}
 
 	var jobs []parseJob
@@ -92,12 +92,13 @@ func Run(cfg *Config) (*Result, error) {
 			continue
 		}
 
-		if c != nil && !c.IsChanged(relPath, content) {
+		hash := cache.HashContent(content)
+		if c != nil && !c.IsChangedByHash(relPath, hash) {
 			result.SkippedFiles++
 			continue
 		}
 
-		jobs = append(jobs, parseJob{relPath: relPath, content: content})
+		jobs = append(jobs, parseJob{relPath: relPath, content: content, hash: hash})
 	}
 
 	// 4. Parse files (parallel)
@@ -118,6 +119,11 @@ func Run(cfg *Config) (*Result, error) {
 			defer wg.Done()
 			sem <- struct{}{}
 			defer func() { <-sem }()
+			defer func() {
+				if r := recover(); r != nil {
+					results[idx] = parseResult{relPath: j.relPath, err: fmt.Errorf("panic: %v", r)}
+				}
+			}()
 
 			pr := parseResult{relPath: j.relPath}
 
@@ -169,7 +175,7 @@ func Run(cfg *Config) (*Result, error) {
 
 		// Update cache
 		if c != nil {
-			c.Update(pr.relPath, jobs[i].content, pr.info.Language)
+			c.UpdateWithHash(pr.relPath, jobs[i].hash, pr.info.Language)
 		}
 
 		allInfos = append(allInfos, pr.info)
@@ -177,25 +183,14 @@ func Run(cfg *Config) (*Result, error) {
 		result.ParsedFiles++
 	}
 
-	// 6. Build dependency graph
-	graph := analyzer.NewDepGraph()
-	for _, info := range allInfos {
-		imports := analyzer.ExtractAndResolve(info, scanResult.Files, cfg.RootDir)
-		for _, imp := range imports {
-			if imp.Status == analyzer.StatusResolved && imp.Resolved != "" {
-				graph.AddEdge(info.File, imp.Resolved)
-			}
-		}
-	}
-
-	// 7. Write index.md
+	// 6. Write index.md
 	if len(allInfos) > 0 || result.RemovedFiles > 0 {
 		if writeErr := output.WriteIndexMD(allInfos, cfg.RootDir, cfg.OutputDir); writeErr != nil {
 			return nil, fmt.Errorf("writing index: %w", writeErr)
 		}
 	}
 
-	// 8. Save cache
+	// 7. Save cache
 	if c != nil {
 		if saveErr := c.Save(); saveErr != nil {
 			return nil, fmt.Errorf("saving cache: %w", saveErr)

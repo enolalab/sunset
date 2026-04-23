@@ -23,9 +23,6 @@ import (
 
 	"github.com/enolalab/sunset/internal/language"
 	"github.com/enolalab/sunset/internal/parser"
-
-	// Register all supported languages.
-	_ "github.com/enolalab/sunset/internal/language"
 )
 
 // FileResult holds the result of parsing a single file.
@@ -60,6 +57,9 @@ func (r *FileResult) Close() {
 
 // HasErrors returns true if the parsed tree contains syntax errors.
 func (r *FileResult) HasErrors() bool {
+	if r.internalTree == nil {
+		return false
+	}
 	return r.internalTree.HasErrors()
 }
 

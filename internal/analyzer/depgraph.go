@@ -2,6 +2,7 @@ package analyzer
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -11,6 +12,8 @@ type DepGraph struct {
 	Edges map[string][]string
 	// ReverseEdges maps a file to files that import it.
 	ReverseEdges map[string][]string
+	// edgeSet tracks existing edges for O(1) dedup.
+	edgeSet map[string]map[string]bool
 }
 
 // NewDepGraph creates an empty dependency graph.
@@ -18,17 +21,20 @@ func NewDepGraph() *DepGraph {
 	return &DepGraph{
 		Edges:        make(map[string][]string),
 		ReverseEdges: make(map[string][]string),
+		edgeSet:      make(map[string]map[string]bool),
 	}
 }
 
 // AddEdge adds a dependency from source to target.
 func (g *DepGraph) AddEdge(source, target string) {
-	// Avoid duplicates
-	for _, existing := range g.Edges[source] {
-		if existing == target {
-			return
-		}
+	// O(1) dedup check
+	if g.edgeSet[source] == nil {
+		g.edgeSet[source] = make(map[string]bool)
 	}
+	if g.edgeSet[source][target] {
+		return
+	}
+	g.edgeSet[source][target] = true
 	g.Edges[source] = append(g.Edges[source], target)
 	g.ReverseEdges[target] = append(g.ReverseEdges[target], source)
 }
@@ -108,7 +114,14 @@ func (g *DepGraph) RenderMarkdown() string {
 		allFiles[f] = true
 	}
 
+	// Collect and sort all files for deterministic output
+	files := make([]string, 0, len(allFiles))
 	for f := range allFiles {
+		files = append(files, f)
+	}
+	sort.Strings(files)
+
+	for _, f := range files {
 		deps := g.Edges[f]
 		revs := g.ReverseEdges[f]
 		depsStr := "-"

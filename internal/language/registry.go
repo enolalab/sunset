@@ -3,6 +3,7 @@
 package language
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -11,7 +12,7 @@ import (
 )
 
 // ErrUnsupportedLanguage is returned when a file's language cannot be detected.
-var ErrUnsupportedLanguage = fmt.Errorf("unsupported language")
+var ErrUnsupportedLanguage = errors.New("unsupported language")
 
 // Language represents a supported programming language with its tree-sitter grammar.
 type Language struct {
@@ -89,7 +90,7 @@ func IsSupported(filename string) bool {
 	return err == nil
 }
 
-// Supported returns all registered languages (alias for All).
+// Supported returns all registered languages.
 func Supported() []*Language {
 	return All()
 }

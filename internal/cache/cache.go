@@ -73,7 +73,11 @@ func (c *Cache) Save() error {
 
 // IsChanged returns true if the file content differs from the cached hash.
 func (c *Cache) IsChanged(relPath string, content []byte) bool {
-	hash := HashContent(content)
+	return c.IsChangedByHash(relPath, HashContent(content))
+}
+
+// IsChangedByHash returns true if the given hash differs from the cached hash.
+func (c *Cache) IsChangedByHash(relPath string, hash string) bool {
 	entry, exists := c.Entries[relPath]
 	if !exists {
 		return true
@@ -83,8 +87,13 @@ func (c *Cache) IsChanged(relPath string, content []byte) bool {
 
 // Update stores the hash for a file.
 func (c *Cache) Update(relPath string, content []byte, langID string) {
+	c.UpdateWithHash(relPath, HashContent(content), langID)
+}
+
+// UpdateWithHash stores a pre-computed hash for a file.
+func (c *Cache) UpdateWithHash(relPath string, hash string, langID string) {
 	c.Entries[relPath] = Entry{
-		Hash:      HashContent(content),
+		Hash:      hash,
 		Language:  langID,
 		UpdatedAt: time.Now(),
 	}

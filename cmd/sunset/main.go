@@ -95,60 +95,12 @@ func cmdParse(args []string) {
 		os.Exit(1)
 	}
 
-	path := fs.Arg(0)
-	if path == "" {
-		path = "."
-	}
-
-	// Validate path
-	info, err := os.Stat(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
-	}
-	_ = info
-
-	// Build config
 	mode := output.ModeSummary
 	if *detail == "full" {
 		mode = output.ModeFullCST
 	}
 
-	var excludePatterns []string
-	if *exclude != "" {
-		excludePatterns = strings.Split(*exclude, ",")
-		for i := range excludePatterns {
-			excludePatterns[i] = strings.TrimSpace(excludePatterns[i])
-		}
-	}
-
-	cfg := &engine.Config{
-		RootDir:     path,
-		OutputDir:   *outputDir,
-		Mode:        mode,
-		MaxDepth:    *maxDepth,
-		Exclude:     excludePatterns,
-		Concurrency: *concurrency,
-		NoCache:     *noCache,
-	}
-
-	if !*quiet {
-		fmt.Printf("🌅 Parsing %s ...\n", path)
-	}
-
-	result, err := engine.Run(cfg)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
-	}
-
-	if !*quiet {
-		printResult(result)
-	}
-
-	if len(result.Errors) > 0 {
-		os.Exit(1)
-	}
+	runEngine(fs.Arg(0), *outputDir, *exclude, *concurrency, *noCache, *quiet, mode, *maxDepth)
 }
 
 // --- update command ---
@@ -173,28 +125,41 @@ func cmdUpdate(args []string) {
 		os.Exit(1)
 	}
 
-	path := fs.Arg(0)
+	runEngine(fs.Arg(0), *outputDir, *exclude, *concurrency, false, *quiet, output.ModeSummary, 0)
+}
+
+// runEngine is the shared logic for parse and update commands.
+func runEngine(pathArg, outputDir, exclude string, concurrency int, noCache, quiet bool, mode output.Mode, maxDepth int) {
+	path := pathArg
 	if path == "" {
 		path = "."
 	}
 
+	// Validate path
+	if _, err := os.Stat(path); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
 	var excludePatterns []string
-	if *exclude != "" {
-		for _, p := range strings.Split(*exclude, ",") {
+	if exclude != "" {
+		for _, p := range strings.Split(exclude, ",") {
 			excludePatterns = append(excludePatterns, strings.TrimSpace(p))
 		}
 	}
 
 	cfg := &engine.Config{
 		RootDir:     path,
-		OutputDir:   *outputDir,
-		Mode:        output.ModeSummary,
+		OutputDir:   outputDir,
+		Mode:        mode,
+		MaxDepth:    maxDepth,
 		Exclude:     excludePatterns,
-		Concurrency: *concurrency,
+		Concurrency: concurrency,
+		NoCache:     noCache,
 	}
 
-	if !*quiet {
-		fmt.Printf("🌅 Updating %s ...\n", path)
+	if !quiet {
+		fmt.Printf("🌅 Parsing %s ...\n", path)
 	}
 
 	result, err := engine.Run(cfg)
@@ -203,8 +168,12 @@ func cmdUpdate(args []string) {
 		os.Exit(1)
 	}
 
-	if !*quiet {
+	if !quiet {
 		printResult(result)
+	}
+
+	if len(result.Errors) > 0 {
+		os.Exit(1)
 	}
 }
 
