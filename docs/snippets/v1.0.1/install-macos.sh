@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# install-macos.sh — Install sunset v1.0.1 on macOS (amd64 or arm64).
+# install-macos.sh — Verify a staged sunset v1.0.1 archive on macOS (amd64 or arm64).
 #
 # Downloads ONLY the target archive plus checksums.txt, verifies the matching
 # SHA-256 entry, extracts the archive, and runs `sunset version`.
 #
-# Defaults to the public v1.0.1 release URL.  Override the base URL for native
-# pre-tag testing:
+# v1.0.1 is a draft-validation artifact, not a public installation source.
+# Set SUNSET_BASE_URL to the staging or loopback server:
 #
 #   SUNSET_BASE_URL=http://127.0.0.1:8080 ./install-macos.sh [amd64|arm64]
 #
@@ -14,7 +14,7 @@
 set -euo pipefail
 
 VERSION="1.0.1"
-BASE_URL="${SUNSET_BASE_URL:-https://github.com/enolalabs/sunset/releases/download/v${VERSION}}"
+BASE_URL="${SUNSET_BASE_URL:?SUNSET_BASE_URL is required for draft verification}"
 ARCH="${1:-$(uname -m)}"
 
 case "$ARCH" in

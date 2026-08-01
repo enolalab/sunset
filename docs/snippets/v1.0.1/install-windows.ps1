@@ -1,10 +1,10 @@
-# install-windows.ps1 — Install sunset v1.0.1 on Windows (amd64).
+# install-windows.ps1 — Verify a staged sunset v1.0.1 archive on Windows (amd64).
 #
 # Downloads ONLY the target archive plus checksums.txt, verifies the matching
 # SHA-256 digest, extracts the archive, and runs `sunset version`.
 #
-# Defaults to the public v1.0.1 release URL.  Override the base URL for native
-# pre-tag testing:
+# v1.0.1 is a draft-validation artifact, not a public installation source.
+# Set SUNSET_BASE_URL to the staging or loopback server:
 #
 #   $env:SUNSET_BASE_URL = "http://127.0.0.1:8080"; .\install-windows.ps1
 #
@@ -13,8 +13,8 @@
 $ErrorActionPreference = "Stop"
 
 $Version    = "1.0.1"
-$DefaultUrl = "https://github.com/enolalabs/sunset/releases/download/v$Version"
-$BaseUrl    = if ($env:SUNSET_BASE_URL) { $env:SUNSET_BASE_URL } else { $DefaultUrl }
+$BaseUrl    = $env:SUNSET_BASE_URL
+if (-not $BaseUrl) { throw "SUNSET_BASE_URL is required for draft verification" }
 $Arch       = "amd64"
 
 $Archive    = "sunset_${Version}_windows_${Arch}.zip"
