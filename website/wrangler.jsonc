@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "sunset-docs",
+  "compatibility_date": "2026-08-02",
+  "assets": {
+    "directory": "./build"
+  },
+  "routes": [
+    {
+      "pattern": "sunset.enolalab.com",
+      "custom_domain": true
+    }
+  ]
+}
