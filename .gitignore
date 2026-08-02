@@ -8,6 +8,11 @@ dist/
 
 # Dependencies
 vendor/
+website/node_modules/
+
+# Documentation site build
+website/build/
+website/.docusaurus/
 
 # IDE
 .idea/

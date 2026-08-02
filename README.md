@@ -16,12 +16,13 @@ Sunset scans your project, extracts functions, types, imports, and docstrings, t
 
 ## Install
 
-Pre-built binaries for **v1.0.1** are published on the
-[GitHub Releases](https://github.com/enolalabs/sunset/releases) page.  Each
-archive is named `sunset_<version>_<os>_<arch>.<format>` and is accompanied by
-a `checksums.txt` file listing every SHA-256 digest.
+The current public release is **v1.0.0**. Download available stable archives
+and `checksums.txt` from the [GitHub Releases](https://github.com/enolalabs/sunset/releases)
+page; it is the authoritative record of public availability.
 
-### v1.0.1 release targets
+`v1.0.1` is a draft-validation release and is not a public installation source.
+
+### Draft v1.0.1 validation targets
 
 | OS | Arch | Archive | Verified on |
 |---|---|---|---|
@@ -34,13 +35,11 @@ a `checksums.txt` file listing every SHA-256 digest.
 > Targets are built and verified on the named GitHub Actions runner
 > environments.  No minimum OS or libc compatibility is claimed.
 
-### Install with checksum verification
+### Draft verification snippets
 
-Each snippet below downloads **only** its target archive plus `checksums.txt`,
-selects the matching SHA-256 entry, verifies it, extracts the archive, and runs
-`sunset version`.  The snippets default to the version-explicit `v1.0.1` URL;
-override `SUNSET_BASE_URL` to point at a loopback server for native pre-tag
-testing.
+These maintainer snippets verify a staged `v1.0.1` archive. They require
+`SUNSET_BASE_URL` to point at a staging or loopback server and are not public
+installation instructions.
 
 > **SHA-256 detects corruption and byte mismatches but does NOT authenticate
 > the publisher.**  Signing and attestations remain future work.
@@ -50,13 +49,13 @@ testing.
 <!-- snippet: docs/snippets/v1.0.1/install-linux.sh -->
 ```bash
 #!/usr/bin/env bash
-# install-linux.sh — Install sunset v1.0.1 on Linux (amd64 or arm64).
+# install-linux.sh — Verify a staged sunset v1.0.1 archive on Linux (amd64 or arm64).
 #
 # Downloads ONLY the target archive plus checksums.txt, verifies the matching
 # SHA-256 entry, extracts the archive, and runs `sunset version`.
 #
-# Defaults to the public v1.0.1 release URL.  Override the base URL for native
-# pre-tag testing:
+# v1.0.1 is a draft-validation artifact, not a public installation source.
+# Set SUNSET_BASE_URL to the staging or loopback server:
 #
 #   SUNSET_BASE_URL=http://127.0.0.1:8080 ./install-linux.sh [amd64|arm64]
 #
@@ -65,7 +64,7 @@ testing.
 set -euo pipefail
 
 VERSION="1.0.1"
-BASE_URL="${SUNSET_BASE_URL:-https://github.com/enolalabs/sunset/releases/download/v${VERSION}}"
+BASE_URL="${SUNSET_BASE_URL:?SUNSET_BASE_URL is required for draft verification}"
 ARCH="${1:-$(uname -m)}"
 
 case "$ARCH" in
@@ -109,13 +108,13 @@ echo "==> Verifying install"
 <!-- snippet: docs/snippets/v1.0.1/install-macos.sh -->
 ```bash
 #!/usr/bin/env bash
-# install-macos.sh — Install sunset v1.0.1 on macOS (amd64 or arm64).
+# install-macos.sh — Verify a staged sunset v1.0.1 archive on macOS (amd64 or arm64).
 #
 # Downloads ONLY the target archive plus checksums.txt, verifies the matching
 # SHA-256 entry, extracts the archive, and runs `sunset version`.
 #
-# Defaults to the public v1.0.1 release URL.  Override the base URL for native
-# pre-tag testing:
+# v1.0.1 is a draft-validation artifact, not a public installation source.
+# Set SUNSET_BASE_URL to the staging or loopback server:
 #
 #   SUNSET_BASE_URL=http://127.0.0.1:8080 ./install-macos.sh [amd64|arm64]
 #
@@ -124,7 +123,7 @@ echo "==> Verifying install"
 set -euo pipefail
 
 VERSION="1.0.1"
-BASE_URL="${SUNSET_BASE_URL:-https://github.com/enolalabs/sunset/releases/download/v${VERSION}}"
+BASE_URL="${SUNSET_BASE_URL:?SUNSET_BASE_URL is required for draft verification}"
 ARCH="${1:-$(uname -m)}"
 
 case "$ARCH" in
@@ -167,13 +166,13 @@ echo "==> Verifying install"
 
 <!-- snippet: docs/snippets/v1.0.1/install-windows.ps1 -->
 ```powershell
-# install-windows.ps1 — Install sunset v1.0.1 on Windows (amd64).
+# install-windows.ps1 — Verify a staged sunset v1.0.1 archive on Windows (amd64).
 #
 # Downloads ONLY the target archive plus checksums.txt, verifies the matching
 # SHA-256 digest, extracts the archive, and runs `sunset version`.
 #
-# Defaults to the public v1.0.1 release URL.  Override the base URL for native
-# pre-tag testing:
+# v1.0.1 is a draft-validation artifact, not a public installation source.
+# Set SUNSET_BASE_URL to the staging or loopback server:
 #
 #   $env:SUNSET_BASE_URL = "http://127.0.0.1:8080"; .\install-windows.ps1
 #
@@ -182,8 +181,8 @@ echo "==> Verifying install"
 $ErrorActionPreference = "Stop"
 
 $Version    = "1.0.1"
-$DefaultUrl = "https://github.com/enolalabs/sunset/releases/download/v$Version"
-$BaseUrl    = if ($env:SUNSET_BASE_URL) { $env:SUNSET_BASE_URL } else { $DefaultUrl }
+$BaseUrl    = $env:SUNSET_BASE_URL
+if (-not $BaseUrl) { throw "SUNSET_BASE_URL is required for draft verification" }
 $Arch       = "amd64"
 
 $Archive    = "sunset_${Version}_windows_${Arch}.zip"
@@ -220,10 +219,17 @@ finally {
 ```
 <!-- /snippet: docs/snippets/v1.0.1/install-windows.ps1 -->
 
-### From source
+### Development installation from source
+
+Clone the public repository and install from the checkout. This follows the
+main branch and is intended for development; use a published release for a
+stable installation.
 
 ```bash
-go install github.com/enolalabs/sunset/cmd/sunset@latest
+git clone https://github.com/enolalabs/sunset.git
+cd sunset
+go install ./cmd/sunset
+sunset version
 ```
 
 Import the library:
@@ -369,14 +375,15 @@ func main() {
     }
     defer result.Close()
 
-    root := result.Tree()
+    root := result.Tree.RootNode()
     fmt.Printf("Language: %s\n", result.Language)
-    fmt.Printf("Root: %s (%d children)\n", root.Kind(), root.ChildCount())
+    fmt.Printf("Root: %s (%d children)\n", root.Type(), root.ChildCount())
 
     // Walk the tree
-    sunset.Walk(root, func(n *sunset.Node) bool {
-        if n.Kind() == "function_declaration" {
-            fmt.Printf("Function at line %d\n", n.StartLine())
+    result.Tree.Walk(func(node *sunset.Node, depth int) bool {
+        if node.Type() == "function_declaration" {
+            position := node.Position()
+            fmt.Printf("Function at %d:%d\n", position.Row, position.Column)
         }
         return true
     })
