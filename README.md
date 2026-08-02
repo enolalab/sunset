@@ -394,7 +394,7 @@ func main() {
 
 ### Real-world Benchmarks
 
-Tested on popular open-source repositories (single run, `--no-cache`, default concurrency):
+Tested on popular open-source repositories (single run, `--no-cache`, default concurrency)
 
 | Repository | Language | Files | Functions | Types | Duration | Files/sec | Output |
 |---|---|---|---|---|---|---|---|
